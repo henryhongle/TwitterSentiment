@@ -1,0 +1,36 @@
+.chart {
+    height: 200px;
+}
+
+.donut{
+    height: 400px;
+}
+
+.map {
+    
+}
+
+.spacer {
+    height: 10px;
+}
+/*
+body{
+    background-color: #2a2a2b;
+}
+
+*/
+/*  Search Bar CSS
+	Source: http://bootsnipp.com/snippets/featured/stylish-input-using-icon-font 
+*/
+.stylish-input-group .input-group-addon{
+    background: white !important; 
+}
+.stylish-input-group .form-control{
+	border-right:0; 
+	box-shadow:0 0 0; 
+	border-color:#ccc;
+}
+.stylish-input-group button{
+    border:0;
+    background:transparent;
+}

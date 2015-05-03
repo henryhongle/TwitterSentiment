@@ -1,0 +1,51 @@
+doctype html
+html
+	head
+		title SentiTracker
+		// Flag sprites service provided by Martijn Lafeber, https://github.com/lafeber/world-flags-sprite/blob/master/LICENSE
+		link(rel='stylesheet', type='text/css', href='http://cloud.github.com/downloads/lafeber/world-flags-sprite/flags32.css')
+		link(href='/css/bootstrap.min.css', rel='stylesheet', type='text/css')
+		link(href='/css/custom.css',rel='stylesheet', type='text/css')
+
+	body 
+		.container
+			.spacer
+			.row
+				.col-sm-6.col-sm-offset-3
+					h3 Twitter sentiment analysis
+					#search
+						form#searchForm.form-inline
+							input#topic.form-control(type='text',placeholder='Search')
+							button.btn.btn-primary(type='submit') Submit
+					
+					#stop
+						h3 Analyzing sentiment...
+						form#stopForm
+							button.btn.btn-primary(type='submit') Stop
+			.spacer
+			.row
+				#semiDonut.donut
+				#lineChart.chart
+			.row
+				#worldMap.map
+		
+		script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
+		script(src='https://cdn.socket.io/socket.io-1.2.0.js')
+
+		//Need these for dynamic line chart
+		script(src='/js/highcharts.js')
+		//script(src='http://code.highcharts.com/highcharts.js')
+		script(src='http://code.highcharts.com/modules/exporting.js')
+		
+		//Need this to include map
+		script(src='http://code.highcharts.com/highcharts-more.js')
+		
+		//Need these for world map
+		script(src='http://code.highcharts.com/maps/modules/map.js')
+		script(src='http://code.highcharts.com/maps/modules/data.js')
+		script(src='http://code.highcharts.com/mapdata/custom/world.js')
+
+		//Load theme and charts
+		//script(src='/js/chartTheme.js')
+		script(src='/js/charts.js')
+	
