@@ -6,7 +6,8 @@ var Twitter = require('twitter');
 var io = require('socket.io')(server);
 var sentiment = require('sentiment');
 var port = 3000;
-var topic = 'obama';
+var mongoose = require("mongoose");
+
 
 // Setup view engine
 app.set('views', path.join(__dirname, '/views'));
@@ -20,26 +21,24 @@ server.listen(port, function(){
 	console.log('Now listening on port: %s', port);
 });
 
-//Set up db
-/*
-mongoose.connect('mongodb://localhost/Sentiment');
-var sentiSchema = new Schema({
-	score: Number,
-	tokens: Array
-});
+mongoose.connect("mongodb://localhost/sentiment");
 
-*/
-//var SentimentModel = mongoose.model('SentimentModel',sentiSchema);
+var tweetSchema = new mongoose.Schema( 
+	{
+		keyword: String,
+		total: Number,
+		pos: Number,
+		neg: Number,
+		neu: Number,
+		date: { type: Date, default: Date.now },
+		score: Number
+	}, {
+		capped: { max: 10, size:1024}
+	}
+);
 
-//new SentimentModel({
-	//score: 5,
-	//tokens: ['hello','world']
-//});
+var Tweets = mongoose.model("Tweets", tweetSchema);
 
-
-
-//For security, variables were defined as enviroment variables
-//Use "export <variable name>=<key>" in terminal to define your keys and token
 var twit = new Twitter({
 	consumer_key: "w6Zw0290V8K7tJUZixqMLWqhi",
 	consumer_secret: "K3SuwDJpYonmf4tGlNKmZ3l0ls1kD6Y422i55IzcHhri1Mg8c9",
@@ -47,12 +46,20 @@ var twit = new Twitter({
 	access_token_secret: "sZhAKjV9iiRsVcCqiCyz6hIU3XOz0Ej38xQ0JviE6uIOm"
 });
 
+var score = {
+			total:0,
+			pos:0,
+			neg:0,
+			neu: 0,
+			currentScore: 0,
+			tweet: ""
+		};
+
 //Turn on socket-io
 io.on('connection', function(socket){
 	console.log("socket connected");
-
 	socket.on("topic", function(topic) {
-		var score = {
+		score = {
 			total:0,
 			pos:0,
 			neg:0,
@@ -60,7 +67,6 @@ io.on('connection', function(socket){
 			currentScore: 0,
 			tweet: ""
 		}
-		console.log(topic);
 		twit.stream('statuses/filter', {track: topic, language:'en'}, function(stream) {
 			stream.on("data", function(tweet) {
 				console.log(tweet);
@@ -80,13 +86,37 @@ io.on('connection', function(socket){
 				}
 				io.emit("data",score);
 			})
-			twit.currentStream = stream;	
+			twit.currentStream = stream;
+			twit.currentKey = topic;	
 		});
-		
+	});
+
+	Tweets.find({}, function(error, tweets) {
+		io.emit("list", tweets);
 	});
 
 	socket.on("stopStreaming", function(data) {
 		twit.currentStream.destroy();
+		var tweet = {
+			keyword: twit.currentKey,
+			total: score.total,
+			pos: score.pos,
+			neg: score.neg,
+			neu: score.neu,
+			score: (score.pos - score.neg) / (score.pos + score.neg)
+		}
+		var newTweet = new Tweets (tweet);
+		newTweet.save(function (err, result) {
+			if (err !==null) {
+				console.log(err);
+			}
+			else {
+				console.log(result);
+				Tweets.find({}, function (error, tweets) {
+					io.emit("list", tweets);
+				});
+			}
+		});
 	});
 });
 

@@ -34,3 +34,11 @@ body{
     border:0;
     background:transparent;
 }
+
+#currentScore {
+    padding-top: 50px;
+}
+
+.form-group {
+    padding-left: 2px;
+}

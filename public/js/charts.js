@@ -1,63 +1,8 @@
-// Core code from: http://jsfiddle.net/gh/get/jquery/1.9.1/highslide-software/highcharts.com/tree/master/samples/highcharts/demo/dynamic-update/
-function displayLineChart(socket){
-    var score;
-    socket.on('sentiment',function(msg){
-        score = msg.score;
-    });
-
-
-    $('#lineChart').highcharts({
-        chart: {
-            type: 'spline',
-            animation: Highcharts.svg, // don't animate in old IE
-            marginRight: 10,
-        },
-        title: {
-            text: 'Real-time Sentiment'
-        },
-        xAxis: {
-            type: 'datetime',
-            tickPixelInterval: 150
-        },
-        yAxis: {
-            title: {
-                text: 'Sentiment Score'
-            },
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }]
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.name + '</b><br/>' +
-                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                    Highcharts.numberFormat(this.y, 2);
-            }
-        },
-        legend: {
-            enabled: false
-        },
-        exporting: {
-            enabled: false
-        },
-        series: [{
-            name: 'Sentiment Score',
-            data: []
-        }]
-    });
-}
-
-
 $(document).ready(function () {
     "use strict";
     $('#stop').hide();
-
+    var totalTweet = document.getElementById("totalTweet");
     var socket = io.connect("http://localhost:3000");
-    
-    //displaySemiDonut(val);
-
     var donut = new Highcharts.Chart({
         chart: {
              renderTo: 'semiDonut',
@@ -98,7 +43,6 @@ $(document).ready(function () {
         }]
     });
 
-
     var lineChart = new Highcharts.Chart({
         chart: {
             renderTo: 'lineChart',
@@ -126,7 +70,6 @@ $(document).ready(function () {
         }]
     });        
 
-
     $("#searchForm").on("submit", function(evt) {
         evt.preventDefault();
         var topic = $('#topic').val();
@@ -145,22 +88,42 @@ $(document).ready(function () {
 
     socket.on("data", function(data) {
         console.log(data);
-
         donut.series[0].setData([
             ['Neutral',data.neu],   
             ['Positive',data.pos],
             ['Negative', data.neg]           
         ]);
         var series = lineChart.series[0];
-        var shift = series.data.length > 50;
-        var score = (data.pos - data.neg) / (data.pos + data.neg);
+        var shift = data.total > 200;
         var x = (new Date()).getTime(); // current time
-        console.log(x);
         var y = data.currentScore;
         $("#tweet").html(data.tweet);
-        lineChart.series[0].addPoint( [x,y], true, shift); 
+        //console.log(data.total);
+        //totalTweet.value = data.total;
+        $("#totalTweet").html(data.total);
+        $("#positiveTweet").html(data.pos);
+        $("#negativeTweet").html(data.neg);
+        $("#neutralTweet").html(data.neu);
+        var sentimentScore = (data.pos - data.neg) / (data.pos + data.neg)
+        $("#sentimentScore").html(parseFloat(sentimentScore).toFixed(2));
+
+        //lineChart.series[0].addPoint( [x,y], true, shift); 
+        lineChart.series[0].addPoint( [x,y],true, shift);
     });
 
-   // displayLineChart(socket);
+    socket.on("list", function(tweets) {
+        console.log(tweets);
+        var title = "<h4 class='text-center'>Last 10 Sentiment Analysis</h4>";
+        var table = title + "<table class='table table-striped table-condensed table-bordered'>";
+        table = table + "<tr><td><b>Keyword</b></td><td><b>Total Tweets</b></td><td><b>Sentiment Score</b></td></tr>";
+        for (var i = tweets.length-1; i >=  0; i--) {
+            table = table + "<tr><td>" + tweets[i].keyword + "</td>";
+            table = table + "<td>" + tweets[i].total + "</td>";
+            table = table + "<td>" + tweets[i].score.toFixed(2) + "</td></tr>";
+        }
+
+        $("#recentSearch").html(table);
+    });
+
 });
 
