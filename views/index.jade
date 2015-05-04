@@ -11,7 +11,7 @@ html
 		.container
 			.spacer
 			.row
-				.col-sm-6.col-sm-offset-3
+				.col-sm-6.col-sm-offset-4
 					h3 Twitter sentiment analysis
 					#search
 						form#searchForm.form-inline
@@ -23,11 +23,13 @@ html
 						form#stopForm
 							button.btn.btn-primary(type='submit') Stop
 			.spacer
+			.spacer
+
 			.row
-				#semiDonut.donut
+				#tweet
 				#lineChart.chart
-			.row
-				#worldMap.map
+				#semiDonut.donut
+
 		
 		script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
 		script(src='https://cdn.socket.io/socket.io-1.2.0.js')

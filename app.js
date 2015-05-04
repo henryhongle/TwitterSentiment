@@ -56,13 +56,18 @@ io.on('connection', function(socket){
 			total:0,
 			pos:0,
 			neg:0,
-			neu: 0
+			neu: 0,
+			currentScore: 0,
+			tweet: ""
 		}
 		console.log(topic);
 		twit.stream('statuses/filter', {track: topic, language:'en'}, function(stream) {
 			stream.on("data", function(tweet) {
+				console.log(tweet);
 				var senti = sentiment(tweet.text);
 				score.total++;
+				score.currentScore = senti.score;
+				score.tweet = tweet.text;
 
 				if (senti.score === 0) {
 					score.neu++;

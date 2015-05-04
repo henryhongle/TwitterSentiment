@@ -11,18 +11,6 @@ function displayLineChart(socket){
             type: 'spline',
             animation: Highcharts.svg, // don't animate in old IE
             marginRight: 10,
-            events: {
-                load: function () {
-
-                    // set up the updating of the chart each second
-                    var series = this.series[0];
-                    setInterval(function () {
-                        var x = (new Date()).getTime(), // current time
-                            y = score;
-                        series.addPoint([x, y], true, true);
-                    }, 1000);
-                }
-            }
         },
         title: {
             text: 'Real-time Sentiment'
@@ -55,21 +43,8 @@ function displayLineChart(socket){
             enabled: false
         },
         series: [{
-            name: 'Random data',
-            data: (function () {
-                // generate an array of random data
-                var data = [],
-                    time = (new Date()).getTime(),
-                    i;
-
-                for (i = -19; i <= 0; i += 1) {
-                    data.push({
-                        x: time + i * 1000,
-                        y: Math.random()
-                    });
-                }
-                return data;
-            }())
+            name: 'Sentiment Score',
+            data: []
         }]
     });
 }
@@ -118,11 +93,39 @@ $(document).ready(function () {
             data: [
                 ['Neutral', 4], 
                 ['Positive', 3],
-                ['Negative', 3]
-                
+                ['Negative', 3]             
             ]
         }]
     });
+
+
+    var lineChart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'lineChart',
+            defaultSeriesType: 'spline'
+        },
+        title: {
+            text: 'Real time sentiment score'
+        },
+        xAxis: {
+            type: 'datetime',
+            tickPixelInterval: 150,
+            maxZoom: 20 * 1000
+        },
+        yAxis: {
+            minPadding: 0.2,
+            maxPadding: 0.2,
+            title: {
+                text: 'Value',
+                margin: 80
+            }
+        },
+        series: [{
+            name: 'Sentiment Score',
+            data: []
+        }]
+    });        
+
 
     $("#searchForm").on("submit", function(evt) {
         evt.preventDefault();
@@ -142,11 +145,20 @@ $(document).ready(function () {
 
     socket.on("data", function(data) {
         console.log(data);
+
         donut.series[0].setData([
             ['Neutral',data.neu],   
             ['Positive',data.pos],
             ['Negative', data.neg]           
-        ]); 
+        ]);
+        var series = lineChart.series[0];
+        var shift = series.data.length > 50;
+        var score = (data.pos - data.neg) / (data.pos + data.neg);
+        var x = (new Date()).getTime(); // current time
+        console.log(x);
+        var y = data.currentScore;
+        $("#tweet").html(data.tweet);
+        lineChart.series[0].addPoint( [x,y], true, shift); 
     });
 
    // displayLineChart(socket);
