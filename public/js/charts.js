@@ -1,11 +1,18 @@
 $(document).ready(function () {
     "use strict";
-    $('#stop').hide();
+    var keyword = '';
     var totalTweet = document.getElementById("totalTweet");
     var socket = io.connect("http://localhost:3000");
+
+    Highcharts.setOptions({
+        global: {
+            useUTC: false
+        }
+    });
+
     var donut = new Highcharts.Chart({
         chart: {
-             renderTo: 'semiDonut',
+            renderTo: 'semiDonut',
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false
@@ -49,7 +56,7 @@ $(document).ready(function () {
             defaultSeriesType: 'spline'
         },
         title: {
-            text: 'Real time sentiment score'
+            text: 'REAL TIME SENTIMENT SCORE'
         },
         xAxis: {
             type: 'datetime',
@@ -60,7 +67,7 @@ $(document).ready(function () {
             minPadding: 0.2,
             maxPadding: 0.2,
             title: {
-                text: 'Value',
+                text: 'SENTIMENT SCORE',
                 margin: 80
             }
         },
@@ -68,12 +75,26 @@ $(document).ready(function () {
             name: 'Sentiment Score',
             data: []
         }]
-    });        
+    }); 
+
+    socket.on("state", function(inUse){
+        keyword = inUse.keyword;
+        $('#status').html('<h3 class="text-warning"> Monitoring "'+ keyword +'"... </h3>');
+        if(inUse.state){
+            $('#stop').show();
+            $('#search').hide(); 
+        }else{
+            $('#stop').hide();
+            $('#search').show();
+        }
+    });       
 
     $("#searchForm").on("submit", function(evt) {
         evt.preventDefault();
         var topic = $('#topic').val();
+        keyword = topic;
         socket.emit("topic", topic);
+        $('#status').html('<h3 class="text-warning"> Monitoring "'+ keyword +'"... </h3>');
         $('#stop').show();
         $('#search').hide();
     });
@@ -85,9 +106,10 @@ $(document).ready(function () {
         $('#search').show();
     });
 
+    
 
     socket.on("data", function(data) {
-        console.log(data);
+        //console.log(data);
         donut.series[0].setData([
             ['Neutral',data.neu],   
             ['Positive',data.pos],
@@ -95,7 +117,7 @@ $(document).ready(function () {
         ]);
         var series = lineChart.series[0];
         var shift = data.total > 200;
-        var x = (new Date()).getTime(); // current time
+        var x = (new Date).getTime(); // current time
         var y = data.currentScore;
         $("#tweet").html(data.tweet);
         //console.log(data.total);
@@ -113,8 +135,8 @@ $(document).ready(function () {
 
     socket.on("list", function(tweets) {
         console.log(tweets);
-        var title = "<h4 class='text-center'>Last 10 Sentiment Analysis</h4>";
-        var table = title + "<table class='table table-striped table-condensed table-bordered'>";
+        var title = "<h4 class='text-center'>LAST 10 SENTIMENT ANALYSIS</h4>";
+        var table = title + "<table class='table table-condensed table-bordered'>";
         table = table + "<tr><td><b>Keyword</b></td><td><b>Total Tweets</b></td><td><b>Sentiment Score</b></td></tr>";
         for (var i = tweets.length-1; i >=  0; i--) {
             table = table + "<tr><td>" + tweets[i].keyword + "</td>";

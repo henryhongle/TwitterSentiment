@@ -2,43 +2,39 @@ doctype html
 html
 	head
 		title SentiTracker
-		// Flag sprites service provided by Martijn Lafeber, https://github.com/lafeber/world-flags-sprite/blob/master/LICENSE
-		link(rel='stylesheet', type='text/css', href='http://cloud.github.com/downloads/lafeber/world-flags-sprite/flags32.css')
 		link(href='/css/bootstrap.min.css', rel='stylesheet', type='text/css')
 		link(href='/css/custom.css',rel='stylesheet', type='text/css')
-
 	body 
 		.container
 			.spacer
 			.row
-				.col-sm-offset-3.col-sm-6
-					h3 Twitter sentiment analysis
+				.col-sm-6.col-sm-offset-3.text-center
+					h1 TWITTER SENTIMENT ANALYSIS
+					#stop
+						form#stopForm
+							.form-group
+								label 
+									#status
+							button.btn.btn-danger(type='submit') Stop
 					#search
 						form#searchForm.form-inline
 							.form-group
 								input#topic.form-control(type='text',placeholder='by keyword')
 							.form-group
-								button.btn.btn-primary(type='submit') Submit
-							//.form-group
-								button#stop.btn.btn-danger Stop
-					
-					#stop
-						form#stopForm.form-inline
-							.form-group
-								
-								button.btn.btn-danger(type='submit') Stop
-								label 
-									p.text-danger Analyzing keyword...
+								button.btn.btn-primary(type='submit')
+									span.glyphicon.glyphicon-search
+
 			.spacer
 			.spacer
 
 			.row
-				p#tweet.text-center
 				#lineChart.chart
+				h4#tweet.text-center.text-danger
 			.row
 				#semiDonut.donut.col-sm-6
-				#currentScore.col-sm-6
-					table.table.table-condensed.table-bordered.table-striped
+				#currentScore.col-sm-offset-1.col-sm-4
+					h4.text-center SENTIMENT DISTRIBUTION TABLE
+					table.table.table-condensed.table-bordered
 						tr
 							td 
 								b Total tweets
@@ -64,30 +60,19 @@ html
 								b Sentiment score
 							td
 								p#sentimentScore 0
-
-					kbd sentimentscore = (positive - negative) / (positive + negative)
+					kbd sentiment score = (positive - negative) / (positive + negative)
 
 			.row
 				#recentSearch.col-sm-offset-3.col-sm-6
 
 					
 		script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
-		script(src='https://cdn.socket.io/socket.io-1.2.0.js')
+		script(src='/js/socket.io-1.2.0.js')
 
-		//Need these for dynamic line chart
 		script(src='/js/highcharts.js')
-		//script(src='http://code.highcharts.com/highcharts.js')
 		script(src='http://code.highcharts.com/modules/exporting.js')
 		
-		//Need this to include map
-		script(src='http://code.highcharts.com/highcharts-more.js')
-		
-		//Need these for world map
-		//script(src='http://code.highcharts.com/maps/modules/map.js')
-		//script(src='http://code.highcharts.com/maps/modules/data.js')
-		//script(src='http://code.highcharts.com/mapdata/custom/world.js')
-
 		//Load theme and charts
-		//script(src='/js/chartTheme.js')
+		script(src='/js/chartTheme.js')
 		script(src='/js/charts.js')
 	
