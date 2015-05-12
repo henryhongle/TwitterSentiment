@@ -19,50 +19,53 @@ html
 					#search
 						form#searchForm.form-inline
 							.form-group
-								input#topic.form-control(type='text',placeholder='by keyword')
+								input#topic.form-control(type='text',placeholder='by keyword', required, autofocus)
 							.form-group
 								button.btn.btn-primary(type='submit')
 									span.glyphicon.glyphicon-search
-
 			.spacer
 			.spacer
-
+			
 			.row
+				//Line Chart
 				#lineChart.chart
 				h4#tweet.text-center.text-danger
 			.row
+				//Donut Chart
 				#semiDonut.donut.col-sm-6
+				//Sentiment Distribution Table
 				#currentScore.col-sm-offset-1.col-sm-4
 					h4.text-center SENTIMENT DISTRIBUTION TABLE
 					table.table.table-condensed.table-bordered
 						tr
 							td 
-								b Total tweets
+								b TOTAL TWEETS
 							td
 								p#totalTweet 0 
 						tr
 							td 
-								b Positive tweets
+								b POSITIVE TWEETS
 							td
 								p#positiveTweet 0
 						tr
 							td 
-								b Negative tweets
+								b NEGATIVE TWEETS
 							td
 								p#negativeTweet 0
 						tr
 							td 
-								b Neutral tweets
+								b NEUTRAL TWEETS
 							td
 								p#neutralTweet 0
 						tr
 							td 
-								b Sentiment score
+								b SENTIMENT SCORE
 							td
 								p#sentimentScore 0
 					kbd sentiment score = (positive - negative) / (positive + negative)
 
 			.row
+				//Last 10 Searches Table
 				#recentSearch.col-sm-offset-3.col-sm-6
 
 					
